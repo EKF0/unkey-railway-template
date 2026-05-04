@@ -6,19 +6,17 @@ One-click deploy [Unkey](https://unkey.dev) (open-source API key management) on 
 
 ## What Gets Deployed
 
-| Service | Image |
-|---------|-------|
-| **Unkey** | `ghcr.io/unkeyed/unkey:v2.0.49` |
+| Service | Image | Port |
+|---------|-------|------|
+| **Unkey** | `ghcr.io/unkeyed/unkey:v2.0.49` | 7070 |
 
 ## After Initial Deploy — Add MySQL + Redis
 
-The initial deploy only launches Unkey. You need to add its datastores:
+The repo deploys only the Unkey service. Add datastores via Railway:
 
 ### 1. Add MySQL
 - In your Railway project, click **+ New** → **Database** → **MySQL**
-- Set variables on the MySQL service:
-  - `MYSQL_DATABASE` = `unkey`
-  - `MYSQL_USER` = `unkey`
+- Go to MySQL service variables, add: `MYSQL_DATABASE` = `unkey`, `MYSQL_USER` = `unkey`
 
 ### 2. Add Redis
 - Click **+ New** → **Database** → **Redis**
@@ -34,11 +32,11 @@ On the Unkey service, go to **Variables** and add:
 
 Then **redeploy** the Unkey service.
 
-### 4. Publish as Template
-Once everything works, click the project's **Settings** → **Publish as Template** to create a one-click template others can use.
+### 4. Healthcheck
+Status page at `https://<your-project-url>/health/live`
 
-## Access the Dashboard
-Your Unkey dashboard will be at the Unkey service's public URL.
+### 5. Publish as Template
+Once everything works: **Settings** → **Publish as Template** for one-click sharing.
 
 ## License
-This template is MIT licensed. See [LICENSE](LICENSE). Unkey itself is MIT licensed.
+MIT. See [LICENSE](LICENSE). Unkey is also MIT licensed.
