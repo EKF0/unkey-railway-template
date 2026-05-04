@@ -28,4 +28,6 @@ To run locally, you would need to set up MySQL and Redis, then run the Unkey bin
 
 ## License
 
-This template is for deploying the Unkey open-source project. Please refer to the [Unkey repository](https://github.com/unkeyed/unkey) for license information.
+This template is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+The Unkey application itself is licensed under the MIT License as well (see [Unkey's License](https://github.com/unkeyed/unkey/blob/main/LICENSE)).
