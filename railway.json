@@ -1,0 +1,74 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "healthcheck": "http://0.0.0.0:3000/health",
+    "healthcheckTimeout": 100,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  },
+  "services": [
+    {
+      "service": "unkey",
+      "build": {
+        "builder": "DOCKERFILE",
+        "dockerfilePath": "./Dockerfile"
+      },
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "env": [
+        {
+          "key": "UNKEY_DATABASE_PRIMARY",
+          "value": "${{MySQL.DATABASE_URL}}"
+        },
+        {
+          "key": "UNKEY_REDIS_URL",
+          "value": "${{Redis.REDIS_URL}}"
+        },
+        {
+          "key": "UNKEY_ROOT_KEY",
+          "generate": true,
+          "length": 32
+        }
+      ]
+    },
+    {
+      "service": "mysql",
+      "name": "MySQL",
+      "image": "mysql:9.4",
+      "env": [
+        {
+          "key": "MYSQL_ROOT_PASSWORD",
+          "generate": true,
+          "length": 16
+        },
+        {
+          "key": "MYSQL_DATABASE",
+          "value": "unkey"
+        },
+        {
+          "key": "MYSQL_USER",
+          "value": "unkey"
+        },
+        {
+          "key": "MYSQL_PASSWORD",
+          "generate": true,
+          "length": 16
+        }
+      ],
+      "healthcheck": "mysqladmin ping -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent",
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10
+    },
+    {
+      "service": "redis",
+      "name": "Redis",
+      "image": "redis:8.2",
+      "healthcheck": "redis-cli ping",
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10
+    }
+  ]
+}
