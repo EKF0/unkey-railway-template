@@ -1,70 +1,11 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "RAILPACK"
+    "builder": "DOCKERFILE"
   },
   "deploy": {
-    "healthcheck": "http://0.0.0.0:3000/health",
-    "healthcheckTimeout": 100,
+    "healthcheckPath": "/health",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
-  },
-  "services": [
-    {
-      "service": "unkey",
-      "image": "ghcr.io/unkeyed/unkey:v2.0.49",
-      "restartPolicyType": "ON_FAILURE",
-      "restartPolicyMaxRetries": 10,
-      "env": [
-        {
-          "key": "UNKEY_DATABASE_PRIMARY",
-          "value": "${{MySQL.MYSQLUSER}}:${{MySQL.MYSQLPASSWORD}}@tcp(${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}})/${{MySQL.MYSQLDATABASE}}?parseTime=true"
-        },
-        {
-          "key": "UNKEY_REDIS_URL",
-          "value": "redis://default:${{Redis.REDISPASSWORD}}@${{Redis.REDISHOST}}:${{Redis.REDISPORT}}"
-        },
-        {
-          "key": "UNKEY_ROOT_KEY",
-          "value": "${{random.hex(32)}}"
-        }
-      ]
-    },
-    {
-      "service": "mysql",
-      "name": "MySQL",
-      "image": "mysql:9.4",
-      "env": [
-        {
-          "key": "MYSQL_DATABASE",
-          "value": "unkey"
-        },
-        {
-          "key": "MYSQL_USER",
-          "value": "unkey"
-        },
-        {
-          "key": "MYSQL_PASSWORD",
-          "generate": true,
-          "length": 16
-        },
-        {
-          "key": "MYSQL_ROOT_PASSWORD",
-          "generate": true,
-          "length": 16
-        }
-      ],
-      "healthcheck": "mysqladmin ping -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent",
-      "restartPolicyType": "ON_FAILURE",
-      "restartPolicyMaxRetries": 10
-    },
-    {
-      "service": "redis",
-      "name": "Redis",
-      "image": "redis:8.2.1",
-      "healthcheck": "redis-cli ping",
-      "restartPolicyType": "ON_FAILURE",
-      "restartPolicyMaxRetries": 10
-    }
-  ]
+  }
 }

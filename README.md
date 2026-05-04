@@ -1,41 +1,44 @@
 # Unkey Railway Template
 
-One-click deploy [Unkey](https://unkey.dev) (open-source API key management) on Railway with MySQL and Redis.
+One-click deploy [Unkey](https://unkey.dev) (open-source API key management) on Railway.
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy?repo=https://github.com/EKF0/unkey-railway-template)
 
-## Services
+## What Gets Deployed
 
-| Service | Image | Purpose |
-|---------|-------|---------|
-| **Unkey** | `ghcr.io/unkeyed/unkey:v2.0.49` | API key management, rate limiting, auth |
-| **MySQL** | `mysql:9.4` | Persistent data (API configs, key metadata) |
-| **Redis** | `redis:8.2.1` | Real-time rate-limiting counters and state |
+| Service | Image |
+|---------|-------|
+| **Unkey** | `ghcr.io/unkeyed/unkey:v2.0.49` |
 
-## What Gets Configured Automatically
+## After Initial Deploy — Add MySQL + Redis
 
-The template wires up all connections between services:
+The initial deploy only launches Unkey. You need to add its datastores:
 
-- `UNKEY_DATABASE_PRIMARY` → MySQL in Go driver format: `user:password@tcp(host:port)/unkey?parseTime=true`
-- `UNKEY_REDIS_URL` → Redis connection: `redis://default:password@host:port`
-- `UNKEY_ROOT_KEY` → Auto-generated 32-char hex key for admin access
+### 1. Add MySQL
+- In your Railway project, click **+ New** → **Database** → **MySQL**
+- Set variables on the MySQL service:
+  - `MYSQL_DATABASE` = `unkey`
+  - `MYSQL_USER` = `unkey`
 
-## After Deployment
+### 2. Add Redis
+- Click **+ New** → **Database** → **Redis**
 
-1. In your Railway project, open the **Unkey** service
-2. Go to the **Variables** tab and note the generated `UNKEY_ROOT_KEY`
-3. Redeploy the Unkey service (if not done automatically)
-4. Access the dashboard at the Unkey service's public URL
+### 3. Set Unkey Environment Variables
+On the Unkey service, go to **Variables** and add:
 
-## Why Railway
+| Variable | Value |
+|----------|-------|
+| `UNKEY_DATABASE_PRIMARY` | `${{MySQL.MYSQLUSER}}:${{MySQL.MYSQLPASSWORD}}@tcp(${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}})/${{MySQL.MYSQLDATABASE}}?parseTime=true` |
+| `UNKEY_REDIS_URL` | `redis://default:${{Redis.REDISPASSWORD}}@${{Redis.REDISHOST}}:${{Redis.REDISPORT}}` |
+| `UNKEY_ROOT_KEY` | `${{random.hex(32)}}` |
 
-- Zero-config database provisioning
-- Automatic environment variable injection between services
-- Private internal networking between Unkey, MySQL, and Redis
-- One-click deploy from this template
+Then **redeploy** the Unkey service.
+
+### 4. Publish as Template
+Once everything works, click the project's **Settings** → **Publish as Template** to create a one-click template others can use.
+
+## Access the Dashboard
+Your Unkey dashboard will be at the Unkey service's public URL.
 
 ## License
-
-This template is MIT licensed. See [LICENSE](LICENSE).
-
-Unkey itself is MIT licensed — see [Unkey's license](https://github.com/unkeyed/unkey/blob/main/LICENSE).
+This template is MIT licensed. See [LICENSE](LICENSE). Unkey itself is MIT licensed.
