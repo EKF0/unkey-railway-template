@@ -105,6 +105,35 @@ unkey-railway-template/
 6. Redeploy → healthy
 7. Access at `https://<domain>/v2/liveness` → `{"message":"we're cooking"}`
 
+#### 6. Root URL Returns 404 — Expected Behavior
+**Problem**: Visiting `https://<domain>/` shows "404 page not found". User expects a dashboard or landing page.
+
+**Why**: Unkey v2.0.49 is a **headless API server**, not a web application. It has no route handler for `/`. All endpoints live under `/v2/*`. This is standard for API servers — the root path is irrelevant.
+
+**Fix**: Use the documented API endpoints. The service is working correctly — 404 at root is by design.
+
+**Available Endpoints in v2.0.49**:
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/v2/liveness` | GET | Health check (returns `"we're cooking"`) |
+| `/v2/keys.verifyKey` | POST | Verify an API key |
+| `/v2/keys.createKey` | POST | Create a new API key |
+| `/v2/keys.deleteKey` | POST | Delete an API key |
+| `/v2/keys.updateKey` | POST | Update key metadata |
+| `/v2/keys.getKey` | POST | Get key details |
+| `/v2/keys.whoami` | POST | Identify the calling key |
+| `/v2/apis.createApi` | POST | Create an API namespace |
+| `/v2/apis.getApi` | POST | Get API details |
+| `/v2/apis.deleteApi` | POST | Delete an API |
+| `/v2/apis.listKeys` | POST | List keys for an API |
+| `/v2/identities.createIdentity` | POST | Create an identity |
+| `/v2/identities.getIdentity` | POST | Get identity details |
+| `/v2/ratelimit.limit` | POST | Check rate limit |
+| `/v2/ratelimit.setOverride` | POST | Set a rate limit override |
+| `/v2/permissions.*` | POST | RBAC permission management |
+
+**Lesson**: API servers ≠ websites. The "homepage" of an API is its documentation or OpenAPI spec, not a root HTML page. The liveness endpoint is the correct thing to check.
+
 ### Useful Railway CLI Commands
 
 ```bash
